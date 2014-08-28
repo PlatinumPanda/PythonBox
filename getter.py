@@ -37,7 +37,17 @@ if __name__ == "__main__":
 	keywords = "pokemon%20charizard%20card%20rare%20mega%20ultra%20bonus"
 	parsed = parse_ebay_json(get_from_ebay(keywords))
 
-	# print titles of each result
+	''' AVAILABLE KEYS FOR EACH RESULT:
+	u'itemId', u'isMultiVariationListing', u'subtitle', u'galleryPlusPictureURL', 
+	u'globalId', u'title', u'country', u'topRatedListing', u'shippingInfo',
+	u'galleryURL', u'autoPay', u'location', u'postalCode', u'returnsAccepted', 
+	u'viewItemURL', u'sellingStatus', u'paymentMethod', u'primaryCategory', u'condition', 
+	u'listingInfo'
+	'''
+
+	# for example, print titles of each result
 	for r in parsed['results']:
 		print r['title']
+
+	# when was this search last done?
 	print parsed['timestamp']
