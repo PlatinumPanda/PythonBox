@@ -49,8 +49,14 @@ def parse_ebay_json(ebay_json):
 
 	# get one price and condition (standardized)
 	for r in results:
-		r['conditionBox'] = r['condition']['conditionDisplayName']
-		r['priceBox'] = r['sellingStatus']['convertedCurrentPrice']['__value__'] # always in USD (converted)
+		try:
+			r['conditionBox'] = r['condition']['conditionDisplayName']
+		except KeyError:
+			r['conditionBox'] = ""
+		try:
+			r['priceBox'] = r['sellingStatus']['convertedCurrentPrice']['__value__'] # always in USD (converted)
+		except KeyError:
+			r['conditionBox'] = ""
 
 	parsed['results'] = results
 	return parsed
