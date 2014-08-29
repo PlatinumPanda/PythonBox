@@ -45,8 +45,14 @@ def parse_ebay_json(ebay_json):
 	parsed['timestamp'] = recursive_delist(data['timestamp'])
 	parsed['version'] = recursive_delist(data['version'])
 	parsed['numResults'] = int(data['searchResult'][0]['@count'])
-	parsed['results'] = recursive_delist(data['searchResult'][0]['item']) #this is an array of item JSON's
+	results = recursive_delist(data['searchResult'][0]['item']) #this is an array of item JSON's
 
+	# get one price and condition (standardized)
+	for r in results:
+		r['conditionBox'] = r['condition']['conditionDisplayName']
+		r['priceBox'] = r['sellingStatus']['convertedCurrentPrice']['__value__'] # always in USD (converted)
+
+	parsed['results'] = results
 	return parsed
 
 if __name__ == "__main__":
