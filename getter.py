@@ -18,24 +18,45 @@ def get_from_ebay(keywords):
 	    print r.url, 'downloaded successfully'
 	    return None
 
+# recursively fixes ebay's ugly obsession with putting things in lists
+def recursive_delist(x):
+	if isinstance(x, basestring):
+		return x
+	else:
+		if isinstance(x, list):
+			if len(x) == 1:
+				return recursive_delist(x[0])
+			else:
+				return [recursive_delist(item) for item in x]
+		if isinstance(x, dict):
+			temp = {}
+			for key in x:
+				temp[key] = recursive_delist(x[key])
+			return temp
+
 def parse_ebay_json(ebay_json):
 	data = ebay_json['findItemsByKeywordsResponse'][0]
 	# fields: itemSearchURL, paginationOutput, ack, timestamp, searchResult, version
 
 	parsed = {}
-	parsed['itemSearchURL'] = data['itemSearchURL']
-	parsed['paginationOutput'] = data['paginationOutput']
-	parsed['ack'] = data['ack']
-	parsed['timestamp'] = data['timestamp']
-	parsed['version'] = data['version']
+	parsed['itemSearchURL'] = recursive_delist(data['itemSearchURL'])
+	parsed['paginationOutput'] = recursive_delist(data['paginationOutput'])
+	parsed['ack'] = recursive_delist(data['ack'])
+	parsed['timestamp'] = recursive_delist(data['timestamp'])
+	parsed['version'] = recursive_delist(data['version'])
 	parsed['numResults'] = int(data['searchResult'][0]['@count'])
-	parsed['results'] = data['searchResult'][0]['item'] #this is an array of item JSON's
+	parsed['results'] = recursive_delist(data['searchResult'][0]['item']) #this is an array of item JSON's
 
 	return parsed
 
 if __name__ == "__main__":
+	# test
 	keywords = "pokemon%20charizard%20card%20rare%20mega%20ultra%20bonus"
 	parsed = parse_ebay_json(get_from_ebay(keywords))
+
+	print parsed
+
+	print "*********************"
 
 	''' AVAILABLE KEYS FOR EACH RESULT:
 	u'itemId', u'isMultiVariationListing', u'subtitle', u'galleryPlusPictureURL', 

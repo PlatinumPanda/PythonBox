@@ -15,7 +15,7 @@ def result():
 	keywords = str(request.args['keyword'])
 	result = getter.parse_ebay_json(getter.get_from_ebay(keywords))
 	return jsonify(**result)
-	
+
 @app.errorhandler(404)
 def page_not_found(e):
     """Return a custom 404 error."""
