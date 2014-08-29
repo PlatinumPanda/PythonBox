@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import getter
 
 app = Flask(__name__)
@@ -14,8 +14,8 @@ def home():
 def result():
 	keywords = str(request.args['keyword'])
 	result = getter.parse_ebay_json(getter.get_from_ebay(keywords))
-	return render_template('result.html', json_result=str(result))
-
+	return jsonify(**result)
+	
 @app.errorhandler(404)
 def page_not_found(e):
     """Return a custom 404 error."""
