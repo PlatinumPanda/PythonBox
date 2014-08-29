@@ -35,31 +35,36 @@ def recursive_delist(x):
 			return temp
 
 def parse_ebay_json(ebay_json):
-	data = ebay_json['findItemsByKeywordsResponse'][0]
-	# fields: itemSearchURL, paginationOutput, ack, timestamp, searchResult, version
+	try:	
+		data = ebay_json['findItemsByKeywordsResponse'][0]
+		# fields: itemSearchURL, paginationOutput, ack, timestamp, searchResult, version
 
-	parsed = {}
-	parsed['itemSearchURL'] = recursive_delist(data['itemSearchURL'])
-	parsed['paginationOutput'] = recursive_delist(data['paginationOutput'])
-	parsed['ack'] = recursive_delist(data['ack'])
-	parsed['timestamp'] = recursive_delist(data['timestamp'])
-	parsed['version'] = recursive_delist(data['version'])
-	parsed['numResults'] = int(data['searchResult'][0]['@count'])
-	results = recursive_delist(data['searchResult'][0]['item']) #this is an array of item JSON's
+		parsed = {}
+		parsed['itemSearchURL'] = recursive_delist(data['itemSearchURL'])
+		parsed['paginationOutput'] = recursive_delist(data['paginationOutput'])
+		parsed['ack'] = recursive_delist(data['ack'])
+		parsed['timestamp'] = recursive_delist(data['timestamp'])
+		parsed['version'] = recursive_delist(data['version'])
+		parsed['numResults'] = int(data['searchResult'][0]['@count'])
+		results = recursive_delist(data['searchResult'][0]['item']) #this is an array of item JSON's
 
-	# get one price and condition (standardized)
-	for r in results:
-		try:
-			r['conditionBox'] = r['condition']['conditionDisplayName']
-		except KeyError:
-			r['conditionBox'] = ""
-		try:
-			r['priceBox'] = r['sellingStatus']['convertedCurrentPrice']['__value__'] # always in USD (converted)
-		except KeyError:
-			r['conditionBox'] = ""
+		# get one price and condition (standardized)
+		for r in results:
+			try:
+				r['conditionBox'] = r['condition']['conditionDisplayName']
+			except KeyError:
+				r['conditionBox'] = ""
+			try:
+				r['priceBox'] = r['sellingStatus']['convertedCurrentPrice']['__value__'] # always in USD (converted)
+			except KeyError:
+				r['conditionBox'] = ""
 
-	parsed['results'] = results
-	return parsed
+		parsed['results'] = results
+		return parsed
+	except Exception as e:
+		parsed = {}
+		parsed['numResults'] = 0
+		return parsed
 
 if __name__ == "__main__":
 	# test
